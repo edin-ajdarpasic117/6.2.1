@@ -1,0 +1,40 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: html-openshift-app
+  labels:
+    app: html-openshift-app
+    app.kubernetes.io/part-of: html-openshift-app
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'html-openshift-app:latest'
+  resources: {}
+  successfulBuildsHistroyLimit: 5
+  failedBuildHistoryLimit: 5
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: 'nginx:1.20-ubi7'
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/edin-ajdarpasic117/6.2.1'
+    contextDir: /app/web
+    sourceSecret:
+      name: html-openshift-app-github
+  triggers: 
+    - type: Generic
+      generic: 
+        secretReference:
+          name: html-openshift-app-generic-webhook-secret
+    - type: ImageChange
+      imageChange: {}
+    - type: ConfigChange
+  runPolicy: Serial
